@@ -1,0 +1,45 @@
+# Project: warloginsrv
+# Compiler: Default GCC compiler
+# Compiler Type: MingW 3
+# Makefile created by wxDev-C++ 6.10.2 on 19/10/08 14:03
+
+CPP       = g++.exe
+CC        = gcc.exe
+WINDRES   = windres.exe
+OBJ       = Objects/MingW/Client.o Objects/MingW/Console.o Objects/MingW/CoreSocket.o Objects/MingW/log.o Objects/MingW/WARLogin.o
+LINKOBJ   = Objects/MingW/Client.o Objects/MingW/Console.o Objects/MingW/CoreSocket.o Objects/MingW/log.o Objects/MingW/WARLogin.o
+LIBS      = -L"C:/Dev-Cpp/Lib" -lwsock32  
+INCS      = -I"include"
+CXXINCS   = -I"C:/Dev-Cpp/lib/gcc/mingw32/3.4.2/include" -I"C:/Dev-Cpp/include/c++/3.4.2/backward" -I"C:/Dev-Cpp/include/c++/3.4.2/mingw32" -I"C:/Dev-Cpp/include/c++/3.4.2" -I"C:/Dev-Cpp/include" -I"C:/Dev-Cpp/" -I"C:/Dev-Cpp/include/common/wx/msw" -I"C:/Dev-Cpp/include/common/wx/generic" -I"C:/Dev-Cpp/include/common/wx/fl" -I"C:/Dev-Cpp/include/common/wx/gizmos" -I"C:/Dev-Cpp/include/common/wx/html" -I"C:/Dev-Cpp/include/common/wx/mmedia" -I"C:/Dev-Cpp/include/common/wx/net" -I"C:/Dev-Cpp/include/common/wx/ogl" -I"C:/Dev-Cpp/include/common/wx/plot" -I"C:/Dev-Cpp/include/common/wx/protocol" -I"C:/Dev-Cpp/include/common/wx/stc" -I"C:/Dev-Cpp/include/common/wx/svg" -I"C:/Dev-Cpp/include/common/wx/xml" -I"C:/Dev-Cpp/include/common/wx/xrc" -I"C:/Dev-Cpp/include/common/wx" -I"C:/Dev-Cpp/include/common"
+RCINCS    = --include-dir "C:/Dev-Cpp/include/common"
+BIN       = Output/MingW/warloginsrv.exe
+DEFINES   = 
+CXXFLAGS  = $(CXXINCS) $(DEFINES) -w  
+CFLAGS    = $(INCS) $(DEFINES)  
+GPROF     = gprof.exe
+RM        = rm -f
+LINK      = g++.exe
+
+.PHONY: all all-before all-after clean clean-custom
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	$(RM) $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(LINK) $(LINKOBJ) -o "Output\MingW\warloginsrv.exe" $(LIBS)
+
+Objects/MingW/Client.o: $(GLOBALDEPS) Client.cpp
+	$(CPP) -c Client.cpp -o Objects/MingW/Client.o $(CXXFLAGS)
+
+Objects/MingW/Console.o: $(GLOBALDEPS) Console.cpp
+	$(CPP) -c Console.cpp -o Objects/MingW/Console.o $(CXXFLAGS)
+
+Objects/MingW/CoreSocket.o: $(GLOBALDEPS) CoreSocket.cpp
+	$(CPP) -c CoreSocket.cpp -o Objects/MingW/CoreSocket.o $(CXXFLAGS)
+
+Objects/MingW/log.o: $(GLOBALDEPS) log.cpp
+	$(CPP) -c log.cpp -o Objects/MingW/log.o $(CXXFLAGS)
+
+Objects/MingW/WARLogin.o: $(GLOBALDEPS) WARLogin/WARLogin.cpp
+	$(CPP) -c WARLogin/WARLogin.cpp -o Objects/MingW/WARLogin.o $(CXXFLAGS)

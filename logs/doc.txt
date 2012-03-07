@@ -1,0 +1,147 @@
+Mythic has a weird way of sending packets, so I'll detail this here. This currently applies for patch and char servers.
+
+C->S = A new packet to be sent over the wire from client to server
+S->C = A new packet to be sent over the wire from server to client
+
+Data Types used in documentation:
+CHAR		1 Byte		(8 bit integer)
+SHORT		2 Bytes		(16 bit integer)
+INT		4 Bytes		(32 bit integer)
+LONG		8 Bytes		(64 bit integer)
+FLOAT		4 BYtes		(32 bit floating point)
+VRB[I]		Variable Amount - "I" is stated if value is known through previous packets or calculation
+
+ASCII STRINGS
+
+A_STRING data types have the following format. Instead of being null terminated, the string size 
+preceeds the data as a (NB)INT. So the string "ABC" in binary would be: 
+
+"ABC"
+03 00 65 66 67
+
+Where 03 00 is the integer number 3, and each byte is a character of the string.
+
+
+
+Note:
+INT's, SHORT's, and LONG's are in NET BYTE order.
+
+----------
+Client Packet Send format:
+
+C->S: 
+BYTE: Packet Data Size
+BYTE: Packet Opcode
+
+C->S: (Actual data for specific opcode is sent here)
+<VRB[Packet Data Size]>: Packet Data, size was sent in previous packet.
+----------
+
+----------
+Client Packet Send format:
+
+S->C:
+BYTE: Packet Data Size
+
+S->C:
+BYTE: Packet Opcode
+
+S->C: (Actual data for specific opcode is sent here)
+<VRB[Packet Data Size]>: Packet Data, size was sent in previous packet.
+----------
+
+Because these messages are sent over TCP, they will always arrive at either point in order.
+
+----------
+Packet Data documentation format:
+
+Opcode: [Opcode Hex Val] (Internal name used in dummy server)
+Direction: S->C (Server->Client), C->S (Client-> Server), OMNI (Omnidirectional)
+Struct: (Packet structure identified here using Data Types stated above)
+Additional Notes: (additional notes added here)
+===
+
+These constants are pieces of data that appear regularly enough to have their own special name:
+
+-
+Term: Client Sequence (abv. CSEQ, SEQ, Sequence)
+The sequence appears as the first 4 bytes in ALL login/patch _DATA_ packets. The client is the only one party that will change the sequence. The server will start its data packet with the client sequence the data is for.
+
+!!! IT IS ASSUMED IN THE DOCUMENTATION THAT ALL DATA PACKETS WILL BEGIN WITH THE CLIENT SEQUENCE INT. THEY WILL NOT BE PRESENT IN THE STRUCT, HOWEVER !!!
+
+I dont know why mythic would have this, because each client and server response/request has its own opcode and with TCP there is no need to keep track of packet order...
+-
+----------
+
+Login/Patch Packet Data documentation:
+
+===
+Opcode: 0x01 (CL_INIT)
+Direction: C->S
+Struct:
+INT:		Unknown (always seen as 0x04)
+
+Additional Notes:
+If the client has logged in recently, it is assumed that the connection is "cached" by the server. This packet wont always be sent on client connect (will skip to CL_USERNAME_MSG).
+===
+
+===
+Opcode: 0x02 (SV_INIT)
+Direction: S->C
+Struct:
+SHORT:		Unknown (always seeen as 0, parms?)
+INT:		Unknown (always seen as 0x04)
+
+Additional Notes:
+Response to CL_INIT.
+See additional notes for CL_INIT. This wont always be sent.
+===
+
+===
+Opcode: 0x03 (CL_USERNAME_MSG)
+Direction: C->S
+Struct:
+SHORT:		Unknown (count?)
+A_STRING:	Username
+===
+
+===
+Opcode: 0x04 (SV_PASS_SEED)
+Direction: S->C
+Struct:
+SHORT:		Unknown (always seen as 0, parms?)
+INT:		SHA256 Seed size (ALWAYS size of 24, 0x18)
+VRB[seed size]:	SHA256 Seed
+
+Additional Notes:
+Response to 0x03 (CL_USERNAME_MSG)
+Seed data changes every login attempt. This is used by the client to generate its password hash, sent in 0x05 (CL_PASS_MSG).
+===
+
+===
+Opcode: 0x05 (CL_PASS_MSG)
+Direction: C->S
+Struct:
+INT:		Hash size (ALWAYS size of 64, 0x40)
+VRB[hash size]:	Password hash (SHA256)
+
+Additional Notes:
+Response to 0x04 (SV_PASS_SEED).
+===
+
+===
+Opcode: 0x06 (SV_USERAUTHD)
+Direction: S->C
+Struct:
+SHORT:		Result Code
+BYTE:		Unknown
+
+Additional Notes:
+Response to 0x05 (Cl_PASS_MSG).
+This authenticates the username/password pair.
+Known result codes: 0 = Good, 0x09 = Bad pass
+===
+
+
+
+
